@@ -17,7 +17,9 @@ namespace diploma
         }
 
         public Image StartPoint { get; set; }
+        public IElement StartElement { get; set; }
         public Image EndPoint { get; set; }
+        public IElement EndElement { get; set; }
         public UIElement Image { get; set; }
 
         public void Run()

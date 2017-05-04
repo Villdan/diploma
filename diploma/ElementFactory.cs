@@ -16,7 +16,7 @@ namespace diploma
     class ElementFactory
     {
         public Canvas canvas = null;
-        private Line _createdLine = null;
+        public Line createdLine = null;
         private Connector _createdConnector = null;
         public IElement CreateElement(string name, UIElement image)
         {
@@ -78,7 +78,7 @@ namespace diploma
             throw new NotImplementedException();
         }
 
-        private Image CreatePointImage()
+        private static Image CreatePointImage()
         {
             Image pointImage = new Image
             {
@@ -104,29 +104,41 @@ namespace diploma
             canvas.Children.Add(outPoint.Image);
             return outPoint;
         }
-        //TODO запретить соединение точки элемента со своей же точкой
+
+        private IElement FindElementByPointImage(Image point)
+        {
+            return MainWindow.ElementsList.FirstOrDefault(element => element.HavePoint(point));
+        }
+
+        private Line CreateLine(Image start)
+        {
+            Line line = new Line();
+            line.X1 = Canvas.GetLeft(start) + 6;
+            line.Y1 = Canvas.GetTop(start) + 6;
+            line.X2 = Canvas.GetLeft(start) + 6;
+            line.Y2 = Canvas.GetTop(start) + 6;
+            SolidColorBrush blackBrush = new SolidColorBrush();
+            blackBrush.Color = Colors.Black;
+            line.StrokeThickness = 1;
+            line.Stroke = blackBrush;
+            return line;
+        }
+
         private void InPoint_MouseUp(object sender, MouseButtonEventArgs e)
         {
             if (_createdConnector == null)
             {
-                Line line = new Line();
-                line.X1 = Canvas.GetLeft((Image)sender) + 6;
-                line.Y1 = Canvas.GetTop((Image)sender) + 6;
-                line.X2 = Canvas.GetLeft((Image)sender) + 6;
-                line.Y2 = Canvas.GetTop((Image)sender) + 6;
-                SolidColorBrush blackBrush = new SolidColorBrush();
-                blackBrush.Color = Colors.Black;
-                line.StrokeThickness = 4;
-                line.Stroke = blackBrush;
+                Line line = CreateLine((Image) sender);
                 Connector connector = new Connector(line);
                 connector.EndPoint = (Image)sender;
+                connector.EndElement = FindElementByPointImage((Image) sender);
                 canvas.Children.Add(connector.Image);
-                _createdLine = line;
+                createdLine = line;
                 _createdConnector = connector;
                 canvas.MouseMove += canvas_MouseMove;
                 canvas.MouseRightButtonUp += canvas_MouseRightButtonUp;
             }
-            else if (_createdConnector.StartPoint != null)
+            else if (_createdConnector.StartPoint != null && !_createdConnector.StartElement.HavePoint((Image)sender))
             {
                 //TODO Добавить вывод ошибки соединения: In to In
                 _createdConnector.EndPoint = (Image)sender;
@@ -136,33 +148,26 @@ namespace diploma
                 MainWindow.Connectors.Add(_createdConnector);
                 canvas.MouseMove -= canvas_MouseMove;
                 canvas.MouseRightButtonUp -= canvas_MouseRightButtonUp;
-                _createdLine = null;
+                createdLine = null;
                 _createdConnector = null;
             }
         }
         
         private void OutPoint_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (_createdConnector == null && !MainWindow.ExistOutPoint((Image)sender))
+            if (_createdConnector == null && !ExistOutPoint((Image)sender))
             {
-                Line line = new Line();
-                line.X1 = Canvas.GetLeft((Image) sender)+6;
-                line.Y1 = Canvas.GetTop((Image)sender)+6;
-                line.X2 = Canvas.GetLeft((Image)sender)+6;
-                line.Y2 = Canvas.GetTop((Image)sender)+6;
-                SolidColorBrush blackBrush = new SolidColorBrush();
-                blackBrush.Color = Colors.Black;
-                line.StrokeThickness = 4;
-                line.Stroke = blackBrush;
+                Line line = CreateLine((Image)sender);
                 Connector connector = new Connector(line);
                 connector.StartPoint = (Image) sender;
+                connector.StartElement = FindElementByPointImage((Image)sender);
                 canvas.Children.Add(connector.Image);
-                _createdLine = line;
+                createdLine = line;
                 _createdConnector = connector;
                 canvas.MouseMove += canvas_MouseMove;
                 canvas.MouseRightButtonUp += canvas_MouseRightButtonUp;
             }
-            else if (_createdConnector?.EndPoint != null && !MainWindow.ExistOutPoint((Image)sender))
+            else if (_createdConnector?.EndPoint != null && !ExistOutPoint((Image)sender) && !_createdConnector.EndElement.HavePoint((Image)sender))
             {
                 //TODO Добавить вывод ошибки соединения: Out to Out, Out already exist
                 _createdConnector.StartPoint = (Image)sender;
@@ -170,7 +175,7 @@ namespace diploma
                 line.X1 = Canvas.GetLeft((Image)sender) + 6;
                 line.Y1 = Canvas.GetTop((Image)sender) + 6;
                 MainWindow.Connectors.Add(_createdConnector);
-                _createdLine = null;
+                createdLine = null;
                 _createdConnector = null;
                 canvas.MouseMove -= canvas_MouseMove;
                 canvas.MouseRightButtonUp -= canvas_MouseRightButtonUp;
@@ -182,13 +187,13 @@ namespace diploma
             if (_createdConnector.StartPoint == null)
             {
                 //TODO придумать как сделать линию по мышкой, что бы не мешала соединять и убрать отступы по 10
-                _createdLine.X1 = e.GetPosition(canvas).X + 10;
-                _createdLine.Y1 = e.GetPosition(canvas).Y + 10;
+                createdLine.X1 = e.GetPosition(canvas).X + 10;
+                createdLine.Y1 = e.GetPosition(canvas).Y + 10;
             }
             else
             {
-                _createdLine.X2 = e.GetPosition(canvas).X + 10;
-                _createdLine.Y2 = e.GetPosition(canvas).Y + 10;
+                createdLine.X2 = e.GetPosition(canvas).X + 10;
+                createdLine.Y2 = e.GetPosition(canvas).Y + 10;
             }
         }
 
@@ -198,7 +203,11 @@ namespace diploma
             canvas.Children.Remove(_createdConnector.Image);
             canvas.MouseRightButtonUp -= canvas_MouseRightButtonUp;
             _createdConnector = null;
-            _createdLine = null;
+            createdLine = null;
+        }
+        private bool ExistOutPoint(Image point)
+        {
+            return MainWindow.Connectors.Any(element => element.HaveOutPoint(point));
         }
 
     }

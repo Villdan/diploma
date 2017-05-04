@@ -22,8 +22,10 @@ namespace diploma
         private readonly ElementFactory _elementFactory = new ElementFactory();
         public static readonly List<IElement> ElementsList = new List<IElement>();
         public static readonly List<Connector> Connectors = new List<Connector>();
-        private IElement _movedElement = null;
-        private Image _movedImage = null;
+        private static IElement _movedElement = null;
+        private static Image _movedImage = null;
+        private static double _distanceBetweenX = 0;
+        private static double _distanceBetweenY = 0;
 
         public MainWindow()
         {
@@ -35,13 +37,16 @@ namespace diploma
         {
             if (_movedElement != null)
             {
-                _movedElement.Move(e.GetPosition(canvas).X,e.GetPosition(canvas).Y);
+                double coordinateX = (e.GetPosition(canvas).X - _distanceBetweenX)<0? 0: e.GetPosition(canvas).X - _distanceBetweenX;
+                double coordinateY = (e.GetPosition(canvas).Y - _distanceBetweenY)<0? 0: e.GetPosition(canvas).Y - _distanceBetweenY;
+                _movedElement.Move(coordinateX, coordinateY);
             }
             else
             {
                 Canvas.SetLeft(_movedImage, e.GetPosition(canvas).X);
                 Canvas.SetTop(_movedImage, e.GetPosition(canvas).Y);
             }
+            
         }
 
         private void Canvas_Drop(object sender, DragEventArgs e)
@@ -56,25 +61,26 @@ namespace diploma
                 Height = 50,
                 Source = createImage.Source
             };
-            img.MouseDown += newImage_PreviewMouseDown;
+            img.MouseDown += newImage_MouseDown;
             Canvas.SetLeft(img, e.GetPosition((canvas)).X);
             Canvas.SetTop(img, e.GetPosition((canvas)).Y);
             ElementsList.Add(_elementFactory.CreateElement(createImage.Name, img));
             createImage.Visibility = Visibility.Hidden;
         }
 
-        private IElement FindElementByImage(Image image)
+        private static IElement FindElementByImage(Image image)
         {
             return ElementsList.FirstOrDefault(element => element.Image.GetHashCode().Equals(image.GetHashCode()));
         }
 
         private void image_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (_elementFactory.createdLine != null) return;
             _movedImage = createImage;
             createImage.Name = ((Image) sender).Name;
-            createImage.Source = ((Image)sender).Source;
+            createImage.Source = ((Image) sender).Source;
             createImage.Visibility = Visibility.Hidden;
-            DragDrop.DoDragDrop((DependencyObject)sender, ((Image)sender).Source, DragDropEffects.Copy);
+            DragDrop.DoDragDrop((DependencyObject) sender, ((Image) sender).Source, DragDropEffects.Copy);
         }
 
         private void Canvas_DragEnter(object sender, DragEventArgs e)
@@ -83,20 +89,20 @@ namespace diploma
             createImage.Visibility = Visibility.Visible;
         }
 
-        private void newImage_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void newImage_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (_elementFactory.createdLine != null) return;
+
             _movedElement = FindElementByImage((Image) sender);
-            _movedImage = (Image)_movedElement.Image;
-            DragDrop.DoDragDrop((DependencyObject)sender, ((Image)sender).Source, DragDropEffects.Move);
+            _movedImage = (Image) _movedElement.Image;
+            _distanceBetweenX = e.GetPosition(canvas).X - Canvas.GetLeft((Image) sender);
+            _distanceBetweenY = e.GetPosition(canvas).Y - Canvas.GetTop((Image)sender);
+            DragDrop.DoDragDrop((DependencyObject) sender, ((Image) sender).Source, DragDropEffects.Move);
         }
 
         private void Canvas_DragLeave(object sender, DragEventArgs e)
         {
             createImage.Visibility = Visibility.Hidden;
-        }
-        public static bool ExistOutPoint(Image point)
-        {
-            return MainWindow.Connectors.Any(element => element.HaveOutPoint(point));
         }
     }
 }
