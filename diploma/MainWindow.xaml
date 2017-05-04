@@ -5,8 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:diploma"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="360" Width="545">
     <Grid>
-        
+        <Border BorderBrush="Black" BorderThickness="1" Margin="163,31,10,10">
+            <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible" >
+                <Canvas x:Name="canvas" Margin="0" AllowDrop="True" Drop="Canvas_Drop" DragOver="Canvas_DragOver" DragEnter="Canvas_DragEnter" DragLeave="Canvas_DragLeave" Background="White" MinHeight="2000" MinWidth="2000">
+                    <Image x:Name="createImage" Height="50" Canvas.Left="19" Canvas.Top="28" Width="62"/>
+                </Canvas>
+            </ScrollViewer >
+        </Border>
+        <Border BorderBrush="Black" BorderThickness="1"  Margin="10,31,0,10" HorizontalAlignment="Left" Width="148" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" >
+                <Grid Margin="0,5,0,0" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <Image Name="Source" RenderTransformOrigin="0.5,0.5" Source="Images/Source.png" Margin="0,0,24,0" PreviewMouseDown="image_PreviewMouseDown" Height="57" VerticalAlignment="Top"/>
+                    <Image Name="Sink" Margin="0,62,24,0" RenderTransformOrigin="0.5,0.5" Source="Images/Sink.png" PreviewMouseDown="image_PreviewMouseDown" Height="48" VerticalAlignment="Top"/>
+                    <Image Name="SelectOutput" Margin="0,115,24,0" RenderTransformOrigin="0.5,0.5" Source="Images/SelectOutput.png" Height="49" VerticalAlignment="Top" PreviewMouseDown="image_PreviewMouseDown"/>
+                    <Image Name="Queue" Margin="0,169,24,0" RenderTransformOrigin="0.5,0.5" Source="Images/Queue.png" Height="47" VerticalAlignment="Top" PreviewMouseDown="image_PreviewMouseDown"/>
+                    <Image Name="Delay" Margin="0,221,24,0" RenderTransformOrigin="0.5,0.5" Source="Images/Delay.png" Height="50" VerticalAlignment="Top" PreviewMouseDown="image_PreviewMouseDown"/>
+                </Grid>
+            </ScrollViewer>
+        </Border>
+
     </Grid>
 </Window>

@@ -55,6 +55,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Connector.cs" />
+    <Compile Include="Delay.cs" />
+    <Compile Include="ElementFactory.cs" />
+    <Compile Include="InPoint.cs" />
+    <Compile Include="OutPoint.cs" />
+    <Compile Include="Queue.cs" />
+    <Compile Include="SelectOutput.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Sink.cs" />
+    <Compile Include="Source.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -63,6 +73,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IElement.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -94,6 +105,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Delay.png" />
+    <Resource Include="Images\Queue.png" />
+    <Resource Include="Images\SelectOutput.png" />
+    <Resource Include="Images\Sink.png" />
+    <Resource Include="Images\Source.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Point.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
