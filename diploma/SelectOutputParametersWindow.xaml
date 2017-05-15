@@ -1,0 +1,15 @@
+﻿<Window x:Class="diploma.SelectOutputParametersWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:diploma"
+        mc:Ignorable="d"
+        Title="SelectOutputParametersWindow" Height="300" Width="300">
+    <Grid>
+        <Button x:Name="OK" Content="Принять" HorizontalAlignment="Left" Margin="53,225,0,0" VerticalAlignment="Top" Width="75" Click="OK_Click"/>
+        <Button x:Name="Cancel" Content="Отмена" HorizontalAlignment="Left" Margin="160,225,0,0" VerticalAlignment="Top" Width="75" Click="Cancel_Click"/>
+        <Label x:Name="label" Content="Вероятность выхода вниз" HorizontalAlignment="Left" Margin="10,33,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="Chance" HorizontalAlignment="Left" Height="23" Margin="202,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="63"/>
+    </Grid>
+</Window>

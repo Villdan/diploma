@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace diploma
@@ -27,10 +29,54 @@ namespace diploma
             throw new NotImplementedException();
         }
 
+        public void Stop()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Move(double mouseX, double mouseY)
         {
             Canvas.SetLeft(Image, mouseX);
             Canvas.SetTop(Image, mouseY);
+        }
+
+        public void MakePointRed()
+        {
+            ImageSourceConverter source = new ImageSourceConverter();
+            StartPoint.Dispatcher.Invoke((Action) (() =>
+            {
+                StartPoint.Source =
+                    (ImageSource) source.ConvertFrom("pack://application:,,,/diploma;component/Images/RedPoint.png");
+            }));
+            EndPoint.Dispatcher.Invoke((Action)(() =>
+            {
+                EndPoint.Source =
+                    (ImageSource) source.ConvertFrom("pack://application:,,,/diploma;component/Images/RedPoint.png");
+            }));
+        }
+        public void MakePointGreen()
+        {
+            ImageSourceConverter source = new ImageSourceConverter();
+            StartPoint.Dispatcher.Invoke((Action)(() =>
+            {
+                StartPoint.Source =
+                    (ImageSource) source.ConvertFrom("pack://application:,,,/diploma;component/Images/Point.png");
+            }));
+            EndPoint.Dispatcher.Invoke((Action)(() =>
+            {
+                EndPoint.Source =
+                    (ImageSource) source.ConvertFrom("pack://application:,,,/diploma;component/Images/Point.png");
+            }));
+        }
+
+        public bool InRequest(double request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OutRequest()
+        {
+            throw new NotImplementedException();
         }
 
         public bool HavePoint(Image point)
@@ -46,6 +92,26 @@ namespace diploma
         public bool HaveOutPoint(Image point)
         {
             return StartPoint.Equals(point);
+        }
+
+        public string GetElementType()
+        {
+            return "Connector";
+        }
+
+        public void Delete(Canvas canvas)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetPointNumber(Image point)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Image GetPointByNumber(int number)
+        {
+            throw new NotImplementedException();
         }
     }
 }

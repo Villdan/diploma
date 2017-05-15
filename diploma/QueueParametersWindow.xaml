@@ -1,0 +1,27 @@
+﻿<Window x:Class="diploma.QueueParametersWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:diploma"
+        mc:Ignorable="d"
+        Title="QueueParametersWindow" Height="300" Width="328.732">
+    <Grid>
+        <Label x:Name="throwOut" Content="Выталкивание из очереди" HorizontalAlignment="Left" Margin="25,57,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="OK" Content="Принять" HorizontalAlignment="Left" Margin="53,225,0,0" VerticalAlignment="Top" Width="75" Click="OK_Click"/>
+        <Button x:Name="Cancel" Content="Отмена" HorizontalAlignment="Left" Margin="160,225,0,0" VerticalAlignment="Top" Width="75" Click="Cancel_Click"/>
+        <Label x:Name="maxCapacity" Content="Вместительность" HorizontalAlignment="Left" Margin="76,26,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="label" Content="Уход по таймауту" HorizontalAlignment="Left" Margin="73,88,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="throwOutCheck" Content="" HorizontalAlignment="Left" Margin="232,68,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="throwOutByTimeout" Content="" HorizontalAlignment="Left" Margin="232,99,0,0" VerticalAlignment="Top" Checked="throwOutByTimeout_Checked" Unchecked="throwOutByTimeout_Unchecked"/>
+        <TextBox x:Name="CapacityInput" HorizontalAlignment="Left" Height="23" Margin="204,30,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="68"/>
+        <Label x:Name="timeLabel" Content="Таймаут через " HorizontalAlignment="Left" Margin="106,119,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="Timeout" HorizontalAlignment="Left" Height="23" Margin="204,121,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="39"/>
+        <ComboBox x:Name="typeOfTime" HorizontalAlignment="Left" Margin="248,121,0,0" VerticalAlignment="Top" Width="63">
+            <ComboBoxItem Content="Сек" IsSelected="True"  HorizontalAlignment="Left" Width="92"/>
+            <ComboBoxItem Content="Мин" HorizontalAlignment="Left" Width="92"/>
+            <ComboBoxItem Content="Часов" HorizontalAlignment="Left" Width="92"/>
+        </ComboBox>
+
+    </Grid>
+</Window>

@@ -10,13 +10,14 @@ namespace diploma
 {
     public class OutPoint
     {
-        public OutPoint(UIElement image)
+        public OutPoint(Image image,Label label)
         {
             Image = image;
+            Label = label;
         }
 
-        public InPoint StartPoint { get; set; }
-        public UIElement Image { get; set; }
+        public Label Label { get; set; }
+        public Image Image { get; set; }
 
         public void Move(double mouseX, double mouseY)
         {
