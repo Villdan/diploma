@@ -207,13 +207,13 @@ namespace diploma
             Canvas.SetLeft(ThrowOut.Image, mouseX + ThrowOutPointLeftOffset);
 
             Canvas.SetTop(ThrowOut.Label, mouseY + ThrowOutPointTopOffset - ThrowPointLabelOffset);
-            Canvas.SetLeft(ThrowOut.Label, mouseX + ThrowOutPointLeftOffset + _labelXOffset);
+            Canvas.SetLeft(ThrowOut.Label, mouseX + ThrowOutPointLeftOffset - _labelYOffset);
 
             Canvas.SetTop(ThrowOut2.Image, mouseY + ThrowOut2PointTopOffset);
             Canvas.SetLeft(ThrowOut2.Image, mouseX + ThrowOut2PointLeftOffset);
 
             Canvas.SetTop(ThrowOut2.Label, mouseY + ThrowOut2PointTopOffset - ThrowPointLabelOffset);
-            Canvas.SetLeft(ThrowOut2.Label, mouseX + ThrowOut2PointLeftOffset + _labelXOffset);
+            Canvas.SetLeft(ThrowOut2.Label, mouseX + ThrowOut2PointLeftOffset + _labelYOffset);
 
             Line line = null;
             foreach (var connector in MainWindow.Connectors)

@@ -61,6 +61,9 @@ namespace diploma
             {
                 double coordinateX = (e.GetPosition(canvas).X - _distanceBetweenX)<0? 0: e.GetPosition(canvas).X - _distanceBetweenX;
                 double coordinateY = (e.GetPosition(canvas).Y - _distanceBetweenY)<0? 0: e.GetPosition(canvas).Y - _distanceBetweenY;
+
+                coordinateX = (e.GetPosition(canvas).X + _distanceBetweenX) > canvas.MinWidth ? canvas.MinWidth - 50 : e.GetPosition(canvas).X - _distanceBetweenX;
+                coordinateY = (e.GetPosition(canvas).Y + _distanceBetweenY) > canvas.MinHeight ? canvas.MinHeight - 50 : e.GetPosition(canvas).Y - _distanceBetweenY;
                 _movedElement.Move(coordinateX, coordinateY);
             }
             else
@@ -83,10 +86,19 @@ namespace diploma
                 Height = ElementsHeight,
                 Source = createImage.Source
             };
+            _distanceBetweenX = e.GetPosition(canvas).X - Canvas.GetLeft(_movedImage);
+            _distanceBetweenY = e.GetPosition(canvas).Y - Canvas.GetTop(_movedImage);
+
+            double coordinateX = (e.GetPosition(canvas).X - _distanceBetweenX) < 0 ? 0 : e.GetPosition(canvas).X - _distanceBetweenX;
+            double coordinateY = (e.GetPosition(canvas).Y - _distanceBetweenY) < 0 ? 0 : e.GetPosition(canvas).Y - _distanceBetweenY;
+
+            coordinateX = (e.GetPosition(canvas).X + _distanceBetweenX) > canvas.MinWidth  - 50 ? canvas.MinWidth - 50 : e.GetPosition(canvas).X - _distanceBetweenX;
+            coordinateY = (e.GetPosition(canvas).Y + _distanceBetweenY) > canvas.MinHeight - 50 ? canvas.MinHeight - 50 : e.GetPosition(canvas).Y - _distanceBetweenY;
+
             img.MouseLeftButtonDown += newImage_MouseDown;
             img.MouseRightButtonUp += Image_MouseRightButtonUp;
-            Canvas.SetLeft(img, e.GetPosition((canvas)).X);
-            Canvas.SetTop(img, e.GetPosition((canvas)).Y);
+            Canvas.SetLeft(img, coordinateX);
+            Canvas.SetTop(img, coordinateY);
             ElementsList.Add(_elementFactory.CreateElement(createImage.Name, img));
             createImage.Visibility = Visibility.Hidden;
         }
