@@ -5,9 +5,66 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:diploma"
         mc:Ignorable="d"
-        Title="SourceParametersWindow" Height="300" Width="300">
+        Title="SourceParametersWindow" Height="385.352" Width="369.296">
     <Grid>
-        <Button x:Name="OK" Content="Принять" HorizontalAlignment="Left" Margin="53,225,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button x:Name="Cancel" Content="Отмена" HorizontalAlignment="Left" Margin="160,225,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="OK" Content="Принять" HorizontalAlignment="Left" Margin="58,305,0,0" VerticalAlignment="Top" Width="75" Click="OK_Click"/>
+        <Button x:Name="Cancel" Content="Отмена" HorizontalAlignment="Left" Margin="222,305,0,0" VerticalAlignment="Top" Width="75" Click="Cancel_Click"/>
+        <Label x:Name="label" Content="Распределение задержки" HorizontalAlignment="Left" Margin="1,57,0,0" VerticalAlignment="Top" Height="28" Width="153"/>
+        <Label x:Name="Param1label_Time" Content="Label" HorizontalAlignment="Left" Margin="26,90,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Param2label_Time" Content="Label" HorizontalAlignment="Left" Margin="114,91,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Param3label_Time" Content="Label" HorizontalAlignment="Left" Margin="197,91,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Param4label_Time" Content="Label" HorizontalAlignment="Left" Margin="281,91,-27,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="Param1_Time" HorizontalAlignment="Left" Height="23" Margin="10,121,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="66" TextChanged="Param1Time_TextChanged"/>
+        <TextBox x:Name="Param2_Time" HorizontalAlignment="Left" Height="23" Margin="100,122,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="66" TextChanged="Param2Time_TextChanged"/>
+        <TextBox x:Name="Param3_Time" HorizontalAlignment="Left" Height="23" Margin="187,122,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="66" TextChanged="Param3Time_TextChanged"/>
+        <TextBox x:Name="Param4_Time" HorizontalAlignment="Left" Height="23" Margin="266,122,-40,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="66" TextChanged="Param4Time_TextChanged"/>
+        <ComboBox x:Name="DistributionComboBox_Time" HorizontalAlignment="Left" Margin="159,60,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="DistributionComboBoxTime_SelectionChanged">
+            <ComboBoxItem Content="Бернулли"/>
+            <ComboBoxItem Content="Бета"/>
+            <ComboBoxItem Content="Биноминальное"/>
+            <ComboBoxItem Content="Вейбулла"/>
+            <ComboBoxItem Content="Гамма"/>
+            <ComboBoxItem Content="Геометрическое"/>
+            <ComboBoxItem Content="Коши"/>
+            <ComboBoxItem Content="Логнормальное"/>
+            <ComboBoxItem Content="Нормальное"/>
+            <ComboBoxItem Content="Парето"/>
+            <ComboBoxItem Content="Пуассона"/>
+            <ComboBoxItem Content="Равномерное" IsSelected="True"/>
+            <ComboBoxItem Content="Хи-квадрат"/>
+            <ComboBoxItem Content="Экспоненциальное"/>
+            <ComboBoxItem Content="Эрлонга"/>
+        </ComboBox>
+        <ComboBox x:Name="typeOfTime" HorizontalAlignment="Left" Margin="279,60,-50,0" VerticalAlignment="Top" Width="63">
+            <ComboBoxItem Content="Сек" IsSelected="True"  HorizontalAlignment="Left" Width="92"/>
+            <ComboBoxItem Content="Мин" HorizontalAlignment="Left" Width="92"/>
+            <ComboBoxItem Content="Часов" HorizontalAlignment="Left" Width="92"/>
+        </ComboBox>
+        <Label x:Name="label_Elem" Content="Распределение элементов" HorizontalAlignment="Left" Margin="10,166,0,0" VerticalAlignment="Top" Height="28" Width="160"/>
+        <Label x:Name="Param1label_Elem" Content="Label" HorizontalAlignment="Left" Margin="26,195,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Param2label_Elem" Content="Label" HorizontalAlignment="Left" Margin="114,196,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Param3label_Elem" Content="Label" HorizontalAlignment="Left" Margin="197,196,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Param4label_Elem" Content="Label" HorizontalAlignment="Left" Margin="281,196,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="Param1_Elem" HorizontalAlignment="Left" Height="23" Margin="10,226,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="66" TextChanged="Param1Elem_TextChanged"/>
+        <TextBox x:Name="Param2_Elem" HorizontalAlignment="Left" Height="23" Margin="100,227,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="66" TextChanged="Param2Elem_TextChanged"/>
+        <TextBox x:Name="Param3_Elem" HorizontalAlignment="Left" Height="23" Margin="187,227,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="66" TextChanged="Param3Elem_TextChanged"/>
+        <TextBox x:Name="Param4_Elem" HorizontalAlignment="Left" Height="23" Margin="266,227,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="66" TextChanged="Param4Elem_TextChanged"/>
+        <ComboBox x:Name="DistributionComboBox_Elem" HorizontalAlignment="Left" Margin="222,168,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="DistributionComboBox_SelectionChanged">
+            <ComboBoxItem Content="Бернулли"/>
+            <ComboBoxItem Content="Бета"/>
+            <ComboBoxItem Content="Биноминальное"/>
+            <ComboBoxItem Content="Вейбулла"/>
+            <ComboBoxItem Content="Гамма"/>
+            <ComboBoxItem Content="Геометрическое"/>
+            <ComboBoxItem Content="Коши"/>
+            <ComboBoxItem Content="Логнормальное"/>
+            <ComboBoxItem Content="Нормальное"/>
+            <ComboBoxItem Content="Парето"/>
+            <ComboBoxItem Content="Пуассона"/>
+            <ComboBoxItem Content="Равномерное" IsSelected="True"/>
+            <ComboBoxItem Content="Хи-квадрат"/>
+            <ComboBoxItem Content="Экспоненциальное"/>
+            <ComboBoxItem Content="Эрлонга"/>
+        </ComboBox>
     </Grid>
 </Window>

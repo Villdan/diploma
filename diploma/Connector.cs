@@ -69,7 +69,7 @@ namespace diploma
             }));
         }
 
-        public bool InRequest(double request)
+        public bool InRequest(double request, long time, long queueTime)
         {
             throw new NotImplementedException();
         }

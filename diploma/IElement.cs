@@ -15,7 +15,7 @@ namespace diploma
         void Run();
         void Stop();
         void Move(double mouseX, double mouseY);
-        bool InRequest(double request);
+        bool InRequest(double request, long time, long queueTime);
         void OutRequest();
         bool HavePoint(Image point);
         bool HaveInPoint(Image point);

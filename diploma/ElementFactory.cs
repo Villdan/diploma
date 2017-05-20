@@ -35,6 +35,7 @@ namespace diploma
             _sinkCount = 1;
             _queueCount = 1;
             _delayCount = 1;
+            _selectOutputCount = 1;
         }
 
         public IElement CreateElement(string name, UIElement image)
@@ -179,7 +180,6 @@ namespace diploma
             }
             else if (_createdConnector.StartPoint != null && !_createdConnector.StartElement.HavePoint((Image)sender))
             {
-                //TODO Добавить вывод ошибки соединения: In to In
                 _createdConnector.EndPoint = (Image)sender;
                 _createdConnector.EndElement = FindElementByPointImage((Image)sender);
                 Line line = (Line) _createdConnector.Image;
@@ -211,7 +211,6 @@ namespace diploma
             }
             else if (_createdConnector?.EndPoint != null && !ExistOutPoint((Image)sender) && !_createdConnector.EndElement.HavePoint((Image)sender))
             {
-                //TODO Добавить вывод ошибки соединения: Out to Out, Out already exist
                 _createdConnector.StartPoint = (Image)sender;
                 _createdConnector.StartElement = FindElementByPointImage((Image)sender);
                 Line line = (Line)_createdConnector.Image;

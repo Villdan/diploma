@@ -5,19 +5,43 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:diploma"
         mc:Ignorable="d"
-        Title="QueueParametersWindow" Height="300" Width="328.732">
-    <Grid>
+        Title="QueueParametersWindow" Height="311.091" Width="380.281">
+    <Grid Margin="0,0,2,4">
         <Label x:Name="throwOut" Content="Выталкивание из очереди" HorizontalAlignment="Left" Margin="25,57,0,0" VerticalAlignment="Top"/>
         <Button x:Name="OK" Content="Принять" HorizontalAlignment="Left" Margin="53,225,0,0" VerticalAlignment="Top" Width="75" Click="OK_Click"/>
         <Button x:Name="Cancel" Content="Отмена" HorizontalAlignment="Left" Margin="160,225,0,0" VerticalAlignment="Top" Width="75" Click="Cancel_Click"/>
         <Label x:Name="maxCapacity" Content="Вместительность" HorizontalAlignment="Left" Margin="76,26,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label" Content="Уход по таймауту" HorizontalAlignment="Left" Margin="73,88,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="label" Content="Уход по таймауту" HorizontalAlignment="Left" Margin="93,88,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="throwOutCheck" Content="" HorizontalAlignment="Left" Margin="232,68,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="throwOutByTimeout" Content="" HorizontalAlignment="Left" Margin="232,99,0,0" VerticalAlignment="Top" Checked="throwOutByTimeout_Checked" Unchecked="throwOutByTimeout_Unchecked"/>
-        <TextBox x:Name="CapacityInput" HorizontalAlignment="Left" Height="23" Margin="204,30,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="68"/>
-        <Label x:Name="timeLabel" Content="Таймаут через " HorizontalAlignment="Left" Margin="106,119,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="Timeout" HorizontalAlignment="Left" Height="23" Margin="204,121,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="39"/>
-        <ComboBox x:Name="typeOfTime" HorizontalAlignment="Left" Margin="248,121,0,0" VerticalAlignment="Top" Width="63">
+        <TextBox x:Name="CapacityInput" HorizontalAlignment="Left" Height="23" Margin="204,30,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="68" TextChanged="CapacityInput_TextChanged"/>
+        <Label x:Name="label_C" Content="Распределение таймаута" HorizontalAlignment="Left" Margin="11,120,0,0" VerticalAlignment="Top" Height="28" Width="153"/>
+        <Label x:Name="Param1label" Content="Label" HorizontalAlignment="Left" Margin="27,152,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Param2label" Content="Label" HorizontalAlignment="Left" Margin="115,153,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Param3label" Content="Label" HorizontalAlignment="Left" Margin="198,153,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Param4label" Content="Label" HorizontalAlignment="Left" Margin="282,153,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="Param1" HorizontalAlignment="Left" Height="23" Margin="11,183,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="66" TextChanged="Param1_TextChanged" />
+        <TextBox x:Name="Param2" HorizontalAlignment="Left" Height="23" Margin="101,184,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="66" TextChanged="Param2_TextChanged"/>
+        <TextBox x:Name="Param3" HorizontalAlignment="Left" Height="23" Margin="188,184,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="66" TextChanged="Param3_TextChanged"/>
+        <TextBox x:Name="Param4" HorizontalAlignment="Left" Height="23" Margin="267,184,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="66" TextChanged="Param4_TextChanged"/>
+        <ComboBox x:Name="DistributionComboBox" HorizontalAlignment="Left" Margin="160,122,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="DistributionComboBox_SelectionChanged">
+            <ComboBoxItem Content="Бернулли"/>
+            <ComboBoxItem Content="Бета"/>
+            <ComboBoxItem Content="Биноминальное"/>
+            <ComboBoxItem Content="Вейбулла"/>
+            <ComboBoxItem Content="Гамма"/>
+            <ComboBoxItem Content="Геометрическое"/>
+            <ComboBoxItem Content="Коши"/>
+            <ComboBoxItem Content="Логнормальное"/>
+            <ComboBoxItem Content="Нормальное"/>
+            <ComboBoxItem Content="Парето"/>
+            <ComboBoxItem Content="Пуассона"/>
+            <ComboBoxItem Content="Равномерное" IsSelected="True"/>
+            <ComboBoxItem Content="Хи-квадрат"/>
+            <ComboBoxItem Content="Экспоненциальное"/>
+            <ComboBoxItem Content="Эрлонга"/>
+        </ComboBox>
+        <ComboBox x:Name="typeOfTime" HorizontalAlignment="Left" Margin="280,122,0,0" VerticalAlignment="Top" Width="63">
             <ComboBoxItem Content="Сек" IsSelected="True"  HorizontalAlignment="Left" Width="92"/>
             <ComboBoxItem Content="Мин" HorizontalAlignment="Left" Width="92"/>
             <ComboBoxItem Content="Часов" HorizontalAlignment="Left" Width="92"/>

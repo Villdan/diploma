@@ -29,13 +29,39 @@ namespace diploma
 
         private void OK_Click(object sender, RoutedEventArgs e)
         {
-            _selectOutput.Chance = Double.Parse(Chance.Text);
+            if (!Validate())
+            {
+                return;
+            }
+            _selectOutput.Chance = double.Parse(Chance.Text);
             this.Close();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+
+
+        private void Chance_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            double number;
+            if (double.TryParse(Chance.Text, out number) && number >= 0 && number <=1)
+            {
+                Chance.Background = Brushes.White;
+                Chance.ToolTip = null;
+            }
+            else
+            {
+                Chance.ToolTip = "Число от 0 до 1";
+                Chance.Background = Brushes.Red;
+            }
+        }
+
+        private bool Validate()
+        {
+            return Equals(Chance.Background, Brushes.White);
         }
     }
 }

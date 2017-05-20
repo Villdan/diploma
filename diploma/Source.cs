@@ -10,12 +10,16 @@ using System.Windows.Shapes;
 
 namespace diploma
 {
-    class Source : IElement
+    public class Source : IElement
     {
         public Source(UIElement image, OutPoint outPoint)
         {
             Image = image;
             Out = outPoint;
+            TimeDistributions.min = 0;
+            TimeDistributions.max = 1;
+            ElementDistributions.min = 0;
+            ElementDistributions.max = 1;
         }
 
         public OutPoint Out { get; set; }
@@ -25,9 +29,8 @@ namespace diploma
         private const int OutPointTopOffset = 19;
         private const int OutPointLeftOffset = 39;
         public DelayType DelayType = DelayType.Second;
-        public int DelayTime = 1;
-        //TODO заменить на Маринин генератор
-        private Random rand = new Random();
+        public Distributions TimeDistributions = new Distributions();
+        public Distributions ElementDistributions = new Distributions();
 
         public void Run()
         {
@@ -36,24 +39,23 @@ namespace diploma
                 {
                     Out.Label.Visibility = Visibility.Visible;
                 }));
-            double randNumber = rand.NextDouble()*10;
             switch (DelayType)
             {
                 case DelayType.Second:
-                    SecondDelay(randNumber);
+                    SecondDelay(TimeDistributions.GetNextRand());
                     break;
                 case DelayType.Minute:
-                    MinuteDelay(randNumber);
+                    MinuteDelay(TimeDistributions.GetNextRand());
                     break;
                 case DelayType.Hour:
-                    HourDelay(randNumber);
+                    HourDelay(TimeDistributions.GetNextRand());
                     break;
             }
             foreach (var connector in MainWindow.Connectors)
             {
                 if (connector.HaveOutPoint((Image) Out.Image))
                 {
-                    if (!connector.EndElement.InRequest(rand.NextDouble()))
+                    if (!connector.EndElement.InRequest(ElementDistributions.GetNextRand(),MainWindow.EmulationTime,0))
                     {
                         MainWindow.ErrorStop(this, Out.Image);
                         return;
@@ -116,13 +118,16 @@ namespace diploma
             }
         }
 
-        public bool InRequest(double request)
+        public bool InRequest(double request, long time, long queueTime)
         {
             return true;
         }
 
         public void OutRequest()
         {
+            ResultWindow.Generated2 = ResultWindow.Generated2 == null
+                        ? "1"
+                        : (int.Parse(ResultWindow.Generated2) + 1).ToString();
             Out.Label.Dispatcher.BeginInvoke((Action) (() => { Out.Label.Content = (Int32.Parse(Out.Label.Content.ToString()) + 1).ToString(); }));
         }
 
@@ -184,5 +189,6 @@ namespace diploma
             }
             return null;
         }
+        
     }
 }

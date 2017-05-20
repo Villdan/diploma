@@ -24,15 +24,56 @@ using diploma;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using LiveCharts;
+using LiveCharts.Configurations;
+using LiveCharts.Defaults;
+using LiveCharts.Wpf;
 
 namespace diploma
 {
-    public enum EmulationStatus : int { On, Pause, Off }
-    public enum DelayType : int { Second, Minute, Hour }
-    public enum MouseAction : int { Move, Delete }
+    public enum EmulationStatus : int
+    {
+        On,
+        Pause,
+        Off
+    }
+
+    public enum DelayType : int
+    {
+        Second,
+        Minute,
+        Hour
+    }
+
+    public enum MouseAction : int
+    {
+        Move,
+        Delete
+    }
+
+    public enum DistributionType : int
+    {
+        Bernoulli,
+        Beta,
+        Binominal,
+        Weibull,
+        Gamma,
+        Geometric,
+        Cauchy,
+        Lognormal,
+        Normal,
+        Pareto,
+        Poisson,
+        Uniform,
+        Chi2,
+        Exponential,
+        Erlang
+    }
 
     public partial class MainWindow : Window
     {
+        public static SeriesCollection SeriesCollection { get; set; }
+        public static List<Tuple<double,long,long>> ResultList = new List<Tuple<double, long, long>>();
         private readonly ElementFactory _elementFactory = new ElementFactory();
         public static readonly List<IElement> ElementsList = new List<IElement>();
         public static readonly List<Connector> Connectors = new List<Connector>();
@@ -46,13 +87,79 @@ namespace diploma
         public static long EmulationTime = 0;
         public const int SynchronizationCoefficient = 10;
         private int speedCoefficient = 1;
+        private ResultWindow resultWindow = null;
         public static MouseAction MouseAction = MouseAction.Move;
         private static bool errorShow = false;
+
+        public class TimeSpanPoint : IObservableChartPoint
+        {
+            private TimeSpan _dateTime;
+            private double _value;
+            
+            public TimeSpanPoint()
+            {
+
+            }
+            
+            public TimeSpanPoint(TimeSpan dateTime, double value)
+            {
+                _dateTime = dateTime;
+                _value = value;
+            }
+            
+            public TimeSpan DateTime
+            {
+                get { return _dateTime; }
+                set
+                {
+                    _dateTime = value;
+                    OnPointChanged();
+                }
+            }
+            
+            public double Value
+            {
+                get { return _value; }
+                set
+                {
+                    _value = value;
+                    OnPointChanged();
+                }
+            }
+            
+            public event Action PointChanged;
+            
+            protected virtual void OnPointChanged()
+            {
+                if (PointChanged != null) PointChanged.Invoke();
+            }
+        }
 
         public MainWindow()
         {
             InitializeComponent();
             _elementFactory.canvas = canvas;
+            var mapper = Mappers.Xy<TimeSpanPoint>()
+                .X(model => model.DateTime.TotalMilliseconds)   //use DateTime.Ticks as X
+                .Y(model => model.Value);           //use the value property as Y
+
+            //lets save the mapper globally.
+            Charting.For<TimeSpanPoint>(mapper);
+            SeriesCollection = new SeriesCollection
+            {
+                new LineSeries()
+                {
+                    Title = "Время отклика",
+                    Values = new ChartValues<TimeSpanPoint>(),
+                    LineSmoothness = 0
+                },
+                new LineSeries()
+                {
+                    Title = "Время в очереди",
+                    Values = new ChartValues<TimeSpanPoint>(),
+                    LineSmoothness = 0
+                }
+            };
         }
 
         private void Canvas_DragOver(object sender, DragEventArgs e)
@@ -156,6 +263,7 @@ namespace diploma
             startButton.IsEnabled = false;
             pauseButton.IsEnabled = true;
             stopButton.IsEnabled = true;
+
             foreach (var element in ElementsList)
             {
                 Thread newThread = new Thread(
@@ -225,6 +333,9 @@ namespace diploma
             {
                 thread.Start();
             }
+            resultWindow = new ResultWindow(this);
+            resultWindow.SeriesCollection = SeriesCollection;
+            resultWindow.Show();
         }
 
         private void pauseButton_Click(object sender, RoutedEventArgs e)
@@ -242,6 +353,11 @@ namespace diploma
         }
 
         private void stopButton_Click(object sender, RoutedEventArgs e)
+        {
+            StopEmulation();
+        }
+
+        public void StopEmulation()
         {
             Emulation = EmulationStatus.Off;
             foreach (var thread in _runnedElementsThreads)
@@ -264,6 +380,12 @@ namespace diploma
             {
                 connect.MakePointGreen();
             }
+            ResultWindow.Generated2 = "0";
+            ResultWindow.Complite2 = "0";
+            MainWindow.SeriesCollection[0].Values.Clear();
+            MainWindow.SeriesCollection[1].Values.Clear();
+            MainWindow.ResultList.Clear();
+            resultWindow.Hide();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -282,54 +404,8 @@ namespace diploma
                 }
             }
         }
-        /*
-        private void increaseSpeed_Click(object sender, RoutedEventArgs e)
-        {
-            if (speedCoefficient == 100)
-            {
-                return;
-            }
-            else if ((speedCoefficient + 1) == 0)
-            {
-                speedCoefficient = speedCoefficient + 2;
-                speed.Content = "x" + speedCoefficient;
-            }
-            else if (speedCoefficient < 0)
-            {
-                speedCoefficient++;
-                speed.Content = "x1/" + Math.Abs(speedCoefficient);
-            }
-            else
-            {
-                speedCoefficient++;
-                speed.Content = "x" + speedCoefficient;
-            }
-        }
+ 
 
-        private void decreaseSpeed_Click(object sender, RoutedEventArgs e)
-        {
-            if (speedCoefficient == -100)
-            {
-                return;
-            }
-            else if ((speedCoefficient - 1) == 0)
-            {
-                speedCoefficient = speedCoefficient - 2;
-                speed.Content = "x1/" + Math.Abs(speedCoefficient);
-                
-            }
-            else if (speedCoefficient > 0)
-            {
-                speedCoefficient--;
-                speed.Content = "x" + speedCoefficient;
-            }
-            else
-            {
-                speedCoefficient--;
-                speed.Content = "x1/" + Math.Abs(speedCoefficient);
-            }
-        }
-        */
         private void increaseSpeed_Click(object sender, RoutedEventArgs e)
         {
             switch (speedCoefficient)
@@ -438,7 +514,6 @@ namespace diploma
         {
             
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            //TODO изменить временное имя SMO
             Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMO");
             saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMO";
             saveFileDialog.Filter = "File (*.dat)|*.dat";
@@ -451,13 +526,14 @@ namespace diploma
                 {
                     Source source = (Source) elem;
                     jObject["DelayType"] = source.DelayType.ToString();
-                    jObject["DelayTime"] = source.DelayTime;
+                    jObject["ElementDistributions"] = JsonConvert.SerializeObject(source.ElementDistributions);
+                    jObject["TimeDistributions"] = JsonConvert.SerializeObject(source.TimeDistributions);
                 }
                 else if (elem.GetType() == typeof(Queue))
                 {
                     Queue queue = (Queue) elem;
                     jObject["DelayType"] = queue.DelayType.ToString();
-                    jObject["TimeLimit"] = queue.TimeLimit;
+                    jObject["Distribution"] = JsonConvert.SerializeObject(queue.TimeLimitDistributions);
                     jObject["Capacity"] = queue.Capacity;
                     jObject["TimeLimitThrowOut"] = queue.TimeLimitThrowOut;
                     jObject["ThrowOutWhenOverflow"] = queue.ThrowOutWhenOverflow;
@@ -466,7 +542,7 @@ namespace diploma
                 {
                     Delay delay = (Delay) elem;
                     jObject["DelayType"] = delay.DelayType.ToString();
-                    jObject["DelayTime"] = delay.DelayTime;
+                    jObject["DelayDistributions"] = JsonConvert.SerializeObject(delay.DelayDistributions);
                     jObject["Capacity"] = delay.Capacity;
                 }
                 else if (elem.GetType() == typeof(SelectOutput))
@@ -494,6 +570,7 @@ namespace diploma
 
         }
 
+
         private static DelayType DelayTypeParseFromString(string delayType)
         {
             switch (delayType)
@@ -516,7 +593,6 @@ namespace diploma
         {
              OpenFileDialog openFileDialog = new OpenFileDialog();
             string filename = null;
-            //TODO изменить временное имя SMO
             Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMO");
               openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SMO";
               openFileDialog.Filter = "File (*.dat)|*.dat";
@@ -552,30 +628,31 @@ namespace diploma
                                 element = _elementFactory.CreateElement("Source", (UIElement) child);
 
                                 ((Source) element).DelayType = DelayTypeParseFromString(jObject["DelayType"].ToString());
-                                ((Source) element).DelayTime = Int32.Parse(jObject["DelayTime"].ToString());
+                                ((Source) element).ElementDistributions = JsonConvert.DeserializeObject<Distributions>(jObject["ElementDistributions"].ToString()); ;
+                                ((Source) element).TimeDistributions = JsonConvert.DeserializeObject<Distributions>(jObject["TimeDistributions"].ToString()); ;
                             }
                             else if (((Image) child).Name.Contains("Queue"))
                             {
                                 element = _elementFactory.CreateElement("Queue", (UIElement) child);
                                 ((Queue) element).DelayType = DelayTypeParseFromString(jObject["DelayType"].ToString());
-                                ((Queue) element).Capacity = Int32.Parse(jObject["Capacity"].ToString());
-                                ((Queue) element).TimeLimit = Int64.Parse(jObject["TimeLimit"].ToString());
+                                ((Queue) element).Capacity = int.Parse(jObject["Capacity"].ToString());
+                                ((Queue)element).TimeLimitDistributions = JsonConvert.DeserializeObject<Distributions>(jObject["Distribution"].ToString()); 
                                 ((Queue) element).TimeLimitThrowOut =
-                                    Boolean.Parse(jObject["TimeLimitThrowOut"].ToString());
+                                    bool.Parse(jObject["TimeLimitThrowOut"].ToString());
                                 ((Queue) element).ThrowOutWhenOverflow =
-                                    Boolean.Parse(jObject["ThrowOutWhenOverflow"].ToString());
+                                    bool.Parse(jObject["ThrowOutWhenOverflow"].ToString());
                             }
                             else if (((Image) child).Name.Contains("Delay"))
                             {
                                 element = _elementFactory.CreateElement("Delay", (UIElement) child);
                                 ((Delay) element).DelayType = DelayTypeParseFromString(jObject["DelayType"].ToString());
-                                ((Delay) element).DelayTime = Int32.Parse(jObject["DelayTime"].ToString());
-                                ((Delay) element).Capacity = Int32.Parse(jObject["Capacity"].ToString());
+                                ((Delay)element).DelayDistributions = JsonConvert.DeserializeObject<Distributions>(jObject["DelayDistributions"].ToString());
+                                ((Delay) element).Capacity = int.Parse(jObject["Capacity"].ToString());
                             }
                             else if (((Image) child).Name.Contains("SelectOutput"))
                             {
                                 element = _elementFactory.CreateElement("SelectOutput", (UIElement) child);
-                                ((SelectOutput) element).Chance = Double.Parse(jObject["Chance"].ToString());
+                                ((SelectOutput) element).Chance = double.Parse(jObject["Chance"].ToString());
                             }
                             else if (((Image) child).Name.Contains("Sink"))
                             {
@@ -596,6 +673,7 @@ namespace diploma
                         connector.EndElement = FindElementByImageName(jObject["EndElement"].ToString());
                         connector.EndPoint =
                             connector.EndElement.GetPointByNumber(Int32.Parse(jObject["EndPointNumber"].ToString()));
+                        connector.Image.MouseUp += connector_MouseUp;
                         Connectors.Add(connector);
                     }
                 }
@@ -620,14 +698,24 @@ namespace diploma
                 }
             }
         }
+        private void connector_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (Emulation != EmulationStatus.Off) return;
+            if (MouseAction == MouseAction.Delete)
+            {
+                Connector deletedConnector = FindConnectorByImage(((Line)sender));
+                canvas.Children.Remove(deletedConnector.Image);
+                Connectors.Remove(deletedConnector);
+            }
+        }
 
-        private void Image_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        private static void Image_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             if(Emulation != EmulationStatus.Off)  return;
             var elem = FindElementByImage((Image) sender);
             if (elem.GetType() == typeof(Source))
             {
-                SourceParametersWindow sourceParametersWindow = new SourceParametersWindow();
+                SourceParametersWindow sourceParametersWindow = new SourceParametersWindow((Source)elem);
                 sourceParametersWindow.Show();
             }
             else if (elem.GetType() == typeof(Queue))
@@ -660,7 +748,7 @@ namespace diploma
                 MouseAction = MouseAction.Move;
             }
         }
-        private Connector FindConnectorByImage(Line connector)
+        private static Connector FindConnectorByImage(Line connector)
         {
             foreach (var connect in MainWindow.Connectors)
             {

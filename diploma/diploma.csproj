@@ -35,6 +35,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LiveCharts, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.0.9.6\lib\net45\LiveCharts.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LiveCharts.Wpf, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.Wpf.0.9.6\lib\net45\LiveCharts.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -61,16 +69,21 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Connector.cs" />
+    <Compile Include="CryptoRandom.cs" />
     <Compile Include="Delay.cs" />
     <Compile Include="DelayParametersWindow.xaml.cs">
       <DependentUpon>DelayParametersWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Distributions.cs" />
     <Compile Include="ElementFactory.cs" />
     <Compile Include="InPoint.cs" />
     <Compile Include="OutPoint.cs" />
     <Compile Include="Queue.cs" />
     <Compile Include="QueueParametersWindow.xaml.cs">
       <DependentUpon>QueueParametersWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ResultWindow.xaml.cs">
+      <DependentUpon>ResultWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="SelectOutput.cs" />
     <Compile Include="SelectOutputParametersWindow.xaml.cs">
@@ -103,11 +116,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ResultWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SelectOutputParametersWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SourceParametersWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Style.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

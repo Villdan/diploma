@@ -16,6 +16,8 @@ namespace diploma
             Image = image;
             In = inPoint;
             Out = outPoint;
+            DelayDistributions.min = 0;
+            DelayDistributions.max = 1;
         }
 
         private const int InPointTopOffset = 19;
@@ -29,12 +31,9 @@ namespace diploma
         public InPoint In { get; set; }
         public OutPoint Out { get; set; }
         public UIElement Image { get; set; }
-        
-        public int DelayTime = 1;
-        private List<double> _requests = new List<double>();
+        private readonly List<Tuple<double, long, long>> _requests = new List<Tuple<double, long, long>>();
         public int Capacity = 1;
-        //TODO заменить на Маринин генератор
-        private Random rand = new Random();
+        public  Distributions DelayDistributions = new Distributions();
         private int _digitCount = 1;
 
         public void Run()
@@ -55,17 +54,16 @@ namespace diploma
               {
                   Out.Label.Visibility = Visibility.Visible;
               }));
-            double randNumber = rand.NextDouble() * 10;
             switch (DelayType)
             {
                 case DelayType.Second:
-                    SecondDelay((int)randNumber);
+                    SecondDelay(DelayDistributions.GetNextRand());
                     break;
                 case DelayType.Minute:
-                    MinuteDelay((int)randNumber);
+                    MinuteDelay(DelayDistributions.GetNextRand());
                     break;
                 case DelayType.Hour:
-                    HourDelay((int)randNumber);
+                    HourDelay(DelayDistributions.GetNextRand());
                     break;
             }
             foreach (var connector in MainWindow.Connectors)
@@ -76,18 +74,24 @@ namespace diploma
                 }
                 if (connector.HaveOutPoint((Image)Out.Image))
                 {
-                    
-                    if (!connector.EndElement.InRequest(_requests.Take(1).GetEnumerator().Current) )
+                    if (_requests[0] != null)
                     {
-                        if (_requests.Count >= Capacity)
+                        if (!connector.EndElement.InRequest(_requests[0].Item1, _requests[0].Item2, _requests[0].Item3))
                         {
-                            MainWindow.ErrorStop(this, Out.Image);
+                            if (_requests.Count >= Capacity)
+                            {
+                                MainWindow.ErrorStop(this, Out.Image);
+                            }
+                        }
+                        else
+                        {
+                            _requests.RemoveAt(0);
+                            OutRequest();
                         }
                     }
                     else
                     {
                         _requests.RemoveAt(0);
-                        OutRequest();
                     }
                 }
             }
@@ -133,6 +137,7 @@ namespace diploma
                   Out.Label.Visibility = Visibility.Hidden;
                   Out.Label.Content = "0";
               }));
+            _requests.Clear();
         }
 
         public void Move(double mouseX, double mouseY)
@@ -168,7 +173,7 @@ namespace diploma
             }
         }
 
-        public bool InRequest(double request)
+        public bool InRequest(double request, long time, long queueTime)
         {
             if (_requests.Count == Capacity)
             {
@@ -177,9 +182,9 @@ namespace diploma
             In.Label.Dispatcher.BeginInvoke(
                 (Action) (() =>
                 {
-                    In.Label.Content = (Int32.Parse(In.Label.Content.ToString()) + 1).ToString();
+                    In.Label.Content = (int.Parse(In.Label.Content.ToString()) + 1).ToString();
                 }));
-            _requests.Add(request);
+            _requests.Add((Tuple.Create(request, time,queueTime)));
             return true;
         }
 
@@ -188,7 +193,7 @@ namespace diploma
             Out.Label.Dispatcher.BeginInvoke(
                (Action)(() =>
                {
-                   Out.Label.Content = (Int32.Parse(Out.Label.Content.ToString()) + 1).ToString();
+                   Out.Label.Content = (int.Parse(Out.Label.Content.ToString()) + 1).ToString();
                }));
         }
 
@@ -259,5 +264,6 @@ namespace diploma
             }
             return null;
         }
+
     }
 }

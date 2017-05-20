@@ -3,9 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         xmlns:local="clr-namespace:diploma"
         mc:Ignorable="d"
-        Title="MainWindow" MinHeight="400" MinWidth="600" Height="400" Width="600" Closing="Window_Closing">
+        Title="MainWindow" MinHeight="400" MinWidth="600" Height="400" Width="600" Closing="Window_Closing" >
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Style.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
         <Border BorderBrush="Black" BorderThickness="1" Margin="163,31,10,61">
             <ScrollViewer x:Name="scrollViewer" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible" >
@@ -39,7 +47,7 @@
             </Grid>
         </Border>
         <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="0,6,0,0" VerticalAlignment="Top" Width="56" Click="saveButton_Click"/>
-        <Button x:Name="loadbutton" Content="Load" HorizontalAlignment="Left" Margin="56,6,0,0" VerticalAlignment="Top" Width="49" Click="loadbutton_Click" />
+         <Button x:Name="loadbutton" Content="Load" HorizontalAlignment="Left" Margin="56,6,0,0" VerticalAlignment="Top" Width="49" Click="loadbutton_Click"/>
         <Button x:Name="mouseAction" Background="White" BorderBrush="Black" Content="Move" HorizontalAlignment="Left" Margin="260,6,0,0" VerticalAlignment="Top" Width="65" Click="mouseAction_Click"/>
         <Label x:Name="label1" Content="Действие по нажатию:" HorizontalAlignment="Left" Margin="124,2,0,0" VerticalAlignment="Top" Height="26" Width="145"/>
 

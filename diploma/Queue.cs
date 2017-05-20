@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -10,6 +11,7 @@ using System.Windows.Shapes;
 
 namespace diploma
 {
+    [Synchronization]
     public class Queue : IElement
     {
         public Queue(UIElement image, InPoint inPoint, OutPoint outPoint, OutPoint throwOut, OutPoint throwOut2)
@@ -19,6 +21,8 @@ namespace diploma
             Out = outPoint;
             ThrowOut = throwOut;
             ThrowOut2 = throwOut2;
+            TimeLimitDistributions.min = 0;
+            TimeLimitDistributions.max = 1;
         }
         public InPoint In { get; set; }
         public OutPoint Out { get; set; }
@@ -26,6 +30,7 @@ namespace diploma
         public OutPoint ThrowOut2 { get; set; }
         public UIElement Image { get; set; }
 
+        public static bool threadLock = false;
         private const int InPointTopOffset = 19;
         private const int OutPointTopOffset = 19;
         private const int OutPointLeftOffset = 60;
@@ -38,11 +43,11 @@ namespace diploma
         private int _digitCount = 1;
         private const int ThrowPointLabelOffset = 20;
 
-        private readonly List<Tuple<double,long>> _requests = new List<Tuple<double, long>>();
+        private readonly List<Tuple<double,long, long, long, long>> _requests = new List<Tuple<double, long, long, long, long>>();
         public bool TimeLimitThrowOut = true;
         public bool ThrowOutWhenOverflow = false;
+        public Distributions TimeLimitDistributions = new Distributions();
         public DelayType DelayType = DelayType.Second;
-        public long TimeLimit = 1;
         public int Capacity = 10000;
 
 
@@ -52,7 +57,7 @@ namespace diploma
             In.Label.Dispatcher.BeginInvoke(
               (Action)(() =>
               {
-                  if (((int)Math.Log10(Double.Parse(In.Label.Content.ToString())) + 1) > _digitCount)
+                  if (((int)Math.Log10(double.Parse(In.Label.Content.ToString())) + 1) > _digitCount)
                   {
                       _digitCount++;
                       _labelXOffset += 9;
@@ -75,16 +80,24 @@ namespace diploma
              {
                  ThrowOut2.Label.Visibility = Visibility.Visible;
              }));
-            List<Tuple<double, long>> removeList = new List<Tuple<double, long>>();
+            List<Tuple<double, long, long, long, long>> removeList = new List<Tuple<double, long, long, long, long>>();
             if (TimeLimitThrowOut)
             {
-                foreach (var req in _requests)
+                Tuple<double, long, long, long, long>[] _removeList = null;
+                threadLock = true;
+                if (_requests.Count!=0)
                 {
-                    if (req.Item2 < MainWindow.EmulationTime)
+                    for (int i = 0; i < _requests.Count; i++)
                     {
-                        removeList.Add(req);
+                        if (_requests[i].Item2<MainWindow.EmulationTime*10)
+                        {
+                            removeList.Add(_requests[i]);
+                        }
                     }
+                    //removeList.AddRange(_requests.Where(req => req.Item2 < MainWindow.EmulationTime * 10));
                 }
+                
+                threadLock = false;
                 foreach (var connector in MainWindow.Connectors)
                 {
                     if (_requests.Count == 0)
@@ -95,7 +108,7 @@ namespace diploma
                     {
                         foreach (var req in removeList)
                         {
-                            if (!connector.EndElement.InRequest(req.Item1) || (_requests.Count  == Capacity))
+                            if (!connector.EndElement.InRequest(req.Item1, req.Item3, (req.Item4 + (MainWindow.EmulationTime - req.Item5))) || (_requests.Count  == Capacity))
                             {
                                 MainWindow.ErrorStop(this,ThrowOut.Image);
                             }
@@ -117,18 +130,17 @@ namespace diploma
                 }
                 if (connector.HaveOutPoint((Image)Out.Image))
                 {
-                    if (!connector.EndElement.InRequest(_requests[0].Item1))
+                    if (!connector.EndElement.InRequest(_requests[0].Item1, _requests[0].Item3, (_requests[0].Item4 + (MainWindow.EmulationTime - _requests[0].Item5))))
                     {
                         if ((_requests.Count >= Capacity))
                         {
                             if (ThrowOutWhenOverflow)
                             {
-                                
                                     foreach (var throwConnector in MainWindow.Connectors)
                                     {
                                         if (throwConnector.HaveOutPoint((Image)ThrowOut2.Image))
                                         {
-                                            if (!throwConnector.EndElement.InRequest(_requests[0].Item1))
+                                            if (!throwConnector.EndElement.InRequest(_requests[0].Item1, _requests[0].Item3, (_requests[0].Item4 + (MainWindow.EmulationTime - _requests[0].Item5))))
                                             {
                                                 MainWindow.ErrorStop(this, ThrowOut2.Image);
                                             }
@@ -184,6 +196,7 @@ namespace diploma
                  ThrowOut2.Label.Visibility = Visibility.Hidden;
                  ThrowOut2.Label.Content = "0";
              }));
+            _requests.Clear();
         }
 
         public void Move(double mouseX, double mouseY)
@@ -207,13 +220,13 @@ namespace diploma
             Canvas.SetLeft(ThrowOut.Image, mouseX + ThrowOutPointLeftOffset);
 
             Canvas.SetTop(ThrowOut.Label, mouseY + ThrowOutPointTopOffset - ThrowPointLabelOffset);
-            Canvas.SetLeft(ThrowOut.Label, mouseX + ThrowOutPointLeftOffset - _labelYOffset);
+            Canvas.SetLeft(ThrowOut.Label, mouseX + ThrowOutPointLeftOffset - _labelYOffset*3);
 
             Canvas.SetTop(ThrowOut2.Image, mouseY + ThrowOut2PointTopOffset);
             Canvas.SetLeft(ThrowOut2.Image, mouseX + ThrowOut2PointLeftOffset);
 
             Canvas.SetTop(ThrowOut2.Label, mouseY + ThrowOut2PointTopOffset - ThrowPointLabelOffset);
-            Canvas.SetLeft(ThrowOut2.Label, mouseX + ThrowOut2PointLeftOffset + _labelYOffset);
+            Canvas.SetLeft(ThrowOut2.Label, mouseX + ThrowOut2PointLeftOffset);
 
             Line line = null;
             foreach (var connector in MainWindow.Connectors)
@@ -243,19 +256,62 @@ namespace diploma
             }
         }
 
-        public bool InRequest(double request)
+        public bool InRequest(double request, long time, long queueTime)
         {
-            if (_requests.Count == Capacity)
+            if (ThrowOutWhenOverflow)
+            {
+                
+            }
+            else if (_requests.Count == Capacity)
             {
                 return false;
             }
+
             In.Label.Dispatcher.BeginInvoke(
                (Action)(() =>
                {
-                   In.Label.Content = (Int32.Parse(In.Label.Content.ToString()) + 1).ToString();
+                   In.Label.Content = (int.Parse(In.Label.Content.ToString()) + 1).ToString();
                }));
-            _requests.Add(Tuple.Create(request, MainWindow.EmulationTime + TimeLimit));
+            switch (DelayType)
+            {
+                case DelayType.Second:
+                    while(threadLock){ }
+                    _requests.Add(Tuple.Create(request, MainWindow.EmulationTime + SecondsToMilliseconds(TimeLimitDistributions.GetNextRand()),time, queueTime,MainWindow.EmulationTime));
+                    break;
+                case DelayType.Minute:
+                    while (threadLock) { }
+                    _requests.Add(Tuple.Create(request, MainWindow.EmulationTime + MinuteToMilliseconds(TimeLimitDistributions.GetNextRand()), time, queueTime, MainWindow.EmulationTime));
+                    break;
+                case DelayType.Hour:
+                    while (threadLock) { }
+                    _requests.Add(Tuple.Create(request, MainWindow.EmulationTime + HoureToMilliseconds(TimeLimitDistributions.GetNextRand()), time, queueTime, MainWindow.EmulationTime));
+                    break;
+            }
             return true;
+        }
+
+        private static long SecondsToMilliseconds(double delayTime)
+        {
+            double secondsToMilliseconds = TimeSpan.FromSeconds(Math.Truncate(delayTime)).TotalMilliseconds;
+            double milliseconds = TimeSpan.FromMilliseconds((delayTime - Math.Truncate(delayTime)) * 1000).TotalMilliseconds;
+            TimeSpan final = TimeSpan.FromMilliseconds((MainWindow.EmulationTime) * MainWindow.SynchronizationCoefficient);
+            return (long.Parse((final.TotalMilliseconds + secondsToMilliseconds + milliseconds).ToString()));
+        }
+
+        private static long MinuteToMilliseconds(double delayTime)
+        {
+            double minuteToMilliseconds = TimeSpan.FromMinutes(Math.Truncate(delayTime)).TotalMilliseconds;
+            double secondsToMilliseconds = TimeSpan.FromSeconds((delayTime - Math.Truncate(delayTime)) * 100).TotalMilliseconds;
+            TimeSpan final = TimeSpan.FromMilliseconds((MainWindow.EmulationTime) * MainWindow.SynchronizationCoefficient);
+            return (long.Parse((final.TotalMilliseconds + secondsToMilliseconds + minuteToMilliseconds).ToString()));
+        }
+
+        private static long HoureToMilliseconds(double delayTime)
+        {
+            double houreToMilliseconds = TimeSpan.FromHours(Math.Truncate(delayTime)).TotalMilliseconds;
+            double minuteToMilliseconds = TimeSpan.FromSeconds((delayTime - Math.Truncate(delayTime)) * 100).TotalMilliseconds;
+            TimeSpan final = TimeSpan.FromMilliseconds((MainWindow.EmulationTime) * MainWindow.SynchronizationCoefficient);
+            return (long.Parse((final.TotalMilliseconds + minuteToMilliseconds + houreToMilliseconds).ToString()));
         }
 
         public void OutRequest()
@@ -372,5 +428,6 @@ namespace diploma
             }
             return null;
         }
+        
     }
 }

@@ -31,11 +31,9 @@ namespace diploma
         private  int _labelXOffset = 7;
         private  int _labelYOffset = 7;
 
-        private List<double> _requests = new List<double>();
+        private readonly List<Tuple<double, long, long>> _requests = new List<Tuple<double, long, long>>();
         public double Chance = 0.5;
         private int _digitCount = 1;
-
-        //TODO заменить на Маринин генератор
         private Random rand = new Random();
 
         public void Run()
@@ -72,7 +70,7 @@ namespace diploma
                     }
                     if (connector.HaveOutPoint((Image)Out1.Image))
                     {
-                        if (!connector.EndElement.InRequest(_requests.Take(1).GetEnumerator().Current))
+                        if (!connector.EndElement.InRequest(_requests[0].Item1, _requests[0].Item2, _requests[0].Item3))
                         {
                             MainWindow.ErrorStop(this, Out1.Image);
                         }
@@ -91,7 +89,7 @@ namespace diploma
                         }
                         if (connector.HaveOutPoint((Image)Out2.Image))
                         {
-                            if (!connector.EndElement.InRequest(_requests.Take(1).GetEnumerator().Current))
+                            if (!connector.EndElement.InRequest(_requests[0].Item1, _requests[0].Item2, _requests[0].Item3))
                             {
                                 MainWindow.ErrorStop(this, Out2.Image);
                             }
@@ -112,7 +110,7 @@ namespace diploma
                     }
                     if (connector.HaveOutPoint((Image)Out2.Image))
                     {
-                        if (!connector.EndElement.InRequest(_requests.Take(1).GetEnumerator().Current))
+                        if (!connector.EndElement.InRequest(_requests[0].Item1, _requests[0].Item2, _requests[0].Item3))
                         {
                             MainWindow.ErrorStop(this, Out2.Image);
                         }
@@ -131,7 +129,7 @@ namespace diploma
                         }
                         if (connector.HaveOutPoint((Image)Out1.Image))
                         {
-                            if (!connector.EndElement.InRequest(_requests.Take(1).GetEnumerator().Current))
+                            if (!connector.EndElement.InRequest(_requests[0].Item1, _requests[0].Item2, _requests[0].Item3))
                             {
                                 MainWindow.ErrorStop(this, Out1.Image);
                             }
@@ -166,6 +164,7 @@ namespace diploma
                   Out2.Label.Visibility = Visibility.Hidden;
                   Out2.Label.Content = "0";
               }));
+            _requests.Clear();
         }
 
         public void Move(double mouseX, double mouseY)
@@ -212,14 +211,14 @@ namespace diploma
             }
         }
 
-        public bool InRequest(double request)
+        public bool InRequest(double request, long time, long queueTime)
         {
             In.Label.Dispatcher.BeginInvoke(
                 (Action) (() =>
                 {
-                    In.Label.Content = (Int32.Parse(In.Label.Content.ToString()) + 1).ToString();
+                    In.Label.Content = (int.Parse(In.Label.Content.ToString()) + 1).ToString();
                 }));
-            _requests.Add(request);
+            _requests.Add((Tuple.Create(request, time,queueTime)));
             return true;
         }
 
@@ -228,7 +227,7 @@ namespace diploma
             Out1.Label.Dispatcher.BeginInvoke(
                 (Action)(() =>
                 {
-                    Out1.Label.Content = (Int32.Parse(Out1.Label.Content.ToString()) + 1).ToString();
+                    Out1.Label.Content = (int.Parse(Out1.Label.Content.ToString()) + 1).ToString();
                 }));
         }
 
@@ -237,7 +236,7 @@ namespace diploma
             Out2.Label.Dispatcher.BeginInvoke(
                (Action)(() =>
                {
-                   Out2.Label.Content = (Int32.Parse(Out2.Label.Content.ToString()) + 1).ToString();
+                   Out2.Label.Content = (int.Parse(Out2.Label.Content.ToString()) + 1).ToString();
                }));
         }
 
@@ -304,17 +303,14 @@ namespace diploma
 
         public Image GetPointByNumber(int number)
         {
-            if (number == 1)
+            switch (number)
             {
-                return (Image) In.Image;
-            }
-            else if (number == 2)
-            {
-                return (Image) Out1.Image;
-            }
-            else if (number == 3)
-            {
-                return (Image) Out2.Image;
+                case 1:
+                    return (Image) In.Image;
+                case 2:
+                    return (Image) Out1.Image;
+                case 3:
+                    return (Image) Out2.Image;
             }
             return null;
         }

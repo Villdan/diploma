@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
+using LiveCharts;
+using LiveCharts.Defaults;
 
 namespace diploma
 {
@@ -24,8 +26,6 @@ namespace diploma
 
         public InPoint In { get; set; }
         public UIElement Image { get; set; }
-
-        private List<double> _requests = new List<double>();
 
         public void Run()
         {
@@ -59,6 +59,7 @@ namespace diploma
                      _digitCount = 1;
                      _labelXOffset = 8;
                  }));
+            MainWindow.ResultList.Clear();
         }
 
         public void Move(double mouseX, double mouseY)
@@ -81,14 +82,17 @@ namespace diploma
             }
         }
 
-        public bool InRequest(double request)
+        public bool InRequest(double request, long time, long queueTime)
         {
-            _requests.Add(request);
+            MainWindow.ResultList.Add((Tuple.Create(request, MainWindow.EmulationTime - time, queueTime)));
             In.Label.Dispatcher.BeginInvoke(
                (Action)(() =>
                {
-                   In.Label.Content = (Int32.Parse(In.Label.Content.ToString()) + 1).ToString();
+                   In.Label.Content = (int.Parse(In.Label.Content.ToString()) + 1).ToString();
                }));
+            ResultWindow.Complite2 = ResultWindow.Complite2 == null
+                        ? "1"
+                        : (int.Parse(ResultWindow.Complite2) + 1).ToString();
             return true;
         }
 

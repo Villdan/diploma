@@ -10,6 +10,6 @@
         <Button x:Name="OK" Content="Принять" HorizontalAlignment="Left" Margin="53,225,0,0" VerticalAlignment="Top" Width="75" Click="OK_Click"/>
         <Button x:Name="Cancel" Content="Отмена" HorizontalAlignment="Left" Margin="160,225,0,0" VerticalAlignment="Top" Width="75" Click="Cancel_Click"/>
         <Label x:Name="label" Content="Вероятность выхода вниз" HorizontalAlignment="Left" Margin="10,33,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="Chance" HorizontalAlignment="Left" Height="23" Margin="202,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="63"/>
+        <TextBox x:Name="Chance" HorizontalAlignment="Left" Height="23" Margin="202,36,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="63" TextChanged="Chance_TextChanged"/>
     </Grid>
 </Window>
